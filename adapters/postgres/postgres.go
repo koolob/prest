@@ -594,15 +594,35 @@ func (adapter *Postgres) Query(SQL string, params ...interface{}) (sc adapters.S
 		sc = &scanner.PrestScanner{Error: err}
 		return
 	}
-	SQL = fmt.Sprintf("SELECT json_agg(s) FROM (%s) s", SQL)
+	//SQL = fmt.Sprintf("SELECT json_agg(s) FROM (%s) s", SQL)
 	log.Debugln("generated SQL:", SQL, " parameters: ", params)
 	p, err := Prepare(db, SQL)
 	if err != nil {
 		sc = &scanner.PrestScanner{Error: err}
 		return
 	}
-	var jsonData []byte
-	err = p.QueryRow(params...).Scan(&jsonData)
+	//var jsonData []byte
+	rows, err :=p.Query(params...)
+	columns, err := rows.Columns()
+	count := len(columns)
+	values := make([]interface{}, count)
+	valuePtrs := make([]interface{}, count)
+	tableData := make([]map[string]interface{}, 0)
+	for rows.Next() {
+		for i := 0; i < count; i++ {
+			valuePtrs[i] = &values[i]
+		}
+		rows.Scan(valuePtrs...)
+		//log.Debugln("query SQL:", SQL, " result: ", values)
+		entry := make(map[string]interface{})
+		for i, col := range columns {
+			entry[col] = values[i]
+		}
+		tableData = append(tableData, entry)
+	}
+	//log.Debugln("query SQL:", SQL, " final result: ", tableData)
+	//err = p.QueryRow(params...).Scan(&jsonData)
+	jsonData, err := json.Marshal(tableData)
 	if len(jsonData) == 0 {
 		jsonData = []byte("[]")
 	}

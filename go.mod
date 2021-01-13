@@ -14,5 +14,6 @@ require (
 	github.com/nuveo/log v0.0.0-20190430190217-44d02db6bdf8
 	github.com/spf13/cobra v1.1.1
 	github.com/spf13/viper v1.7.1
+	github.com/stretchr/objx v0.1.1 // indirect
 	github.com/urfave/negroni v1.0.0
 )
