@@ -162,7 +162,8 @@ func chkInvalidIdentifier(identifer ...string) bool {
 				v != '*' &&
 				v != '[' &&
 				v != ']' &&
-				v != '"' {
+				v != '"' &&
+				v != ' ' {
 				return true
 			}
 			if unicode.Is(unicode.Quotation_Mark, v) {
